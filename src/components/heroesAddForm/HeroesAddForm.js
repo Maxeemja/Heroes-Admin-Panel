@@ -1,22 +1,51 @@
-
-
-// Задача для этого компонента:
-// Реализовать создание нового героя с введенными данными. Он должен попадать
-// в общее состояние и отображаться в списке + фильтроваться
-// Уникальный идентификатор персонажа можно сгенерировать через uiid
-// Усложненная задача:
-// Персонаж создается и в файле json при помощи метода POST
-// Дополнительно:
-// Элементы <option></option> желательно сформировать на базе
-// данных из фильтров
+import {useHttp} from '../../hooks/http.hook';
+import { useDispatch } from 'react-redux';
+import { heroesFetching, heroAdded, heroesFetchingError} from '../../actions';
+import { v4 as uuidv4 } from 'uuid';
+import { useSelector } from 'react-redux';
 
 const HeroesAddForm = () => {
+    const dispatch = useDispatch();
+    const {request} = useHttp();
+    const { filters } = useSelector(state => state.filters);
+    let temp = {id: '',
+                name: '',
+                description: '',
+                element: null}
+
+    const handleChange = (e) => {
+        switch(e.target["name"]){
+            case 'name':
+                temp.name = e.target.value;
+                break;
+            case 'text':
+                temp.description = e.target.value;
+                break;
+            case 'element':
+                temp.element = e.target.value;
+                break
+            default:
+                break;
+        }
+    }
+
+    const addHero = (e) => {
+        e.preventDefault();
+        temp.id = uuidv4();
+        e.target.reset();
+        dispatch(heroesFetching());
+        request(`http://localhost:3001/heroes/`, "POST", JSON.stringify(temp))
+            .then(dispatch(heroAdded(temp)))
+            .catch(() => dispatch(heroesFetchingError()))
+    }
+
     return (
-        <form className="border p-4 shadow-lg rounded">
+        <form className="border p-4 shadow-lg rounded" onSubmit={addHero}>
             <div className="mb-3">
                 <label htmlFor="name" className="form-label fs-4">Имя нового героя</label>
                 <input 
                     required
+                    onChange={handleChange}
                     type="text" 
                     name="name" 
                     className="form-control" 
@@ -29,6 +58,7 @@ const HeroesAddForm = () => {
                 <textarea
                     required
                     name="text" 
+                    onChange={handleChange}
                     className="form-control" 
                     id="text" 
                     placeholder="Что я умею?"
@@ -41,12 +71,10 @@ const HeroesAddForm = () => {
                     required
                     className="form-select" 
                     id="element" 
+                    onChange={handleChange}
                     name="element">
                     <option >Я владею элементом...</option>
-                    <option value="fire">Огонь</option>
-                    <option value="water">Вода</option>
-                    <option value="wind">Ветер</option>
-                    <option value="earth">Земля</option>
+                    {filters.map((el, i) => el.value !== 'all' ? <option key={i} value={el.value}>{el.name}</option> : null)}
                 </select>
             </div>
 
