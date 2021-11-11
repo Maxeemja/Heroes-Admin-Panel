@@ -10,7 +10,7 @@ const HeroesAddForm = () => {
     const {request} = useHttp();
     const {filtersLoadingStatus} = useSelector(state => state.filters);
     const filters = selectAll(store.getState());
-    
+    console.log(store.getState())
     let temp = {id: '',
                 name: '',
                 description: '',
