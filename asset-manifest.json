@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/heroes-admin-panel/static/css/main.7b296806.chunk.css",
-    "main.js": "/heroes-admin-panel/static/js/main.6243de68.chunk.js",
-    "main.js.map": "/heroes-admin-panel/static/js/main.6243de68.chunk.js.map",
+    "main.js": "/heroes-admin-panel/static/js/main.b40d5654.chunk.js",
+    "main.js.map": "/heroes-admin-panel/static/js/main.b40d5654.chunk.js.map",
     "runtime-main.js": "/heroes-admin-panel/static/js/runtime-main.aa2104a7.js",
     "runtime-main.js.map": "/heroes-admin-panel/static/js/runtime-main.aa2104a7.js.map",
     "static/css/2.c62e3214.chunk.css": "/heroes-admin-panel/static/css/2.c62e3214.chunk.css",
@@ -19,6 +19,6 @@
     "static/css/2.c62e3214.chunk.css",
     "static/js/2.49ab532a.chunk.js",
     "static/css/main.7b296806.chunk.css",
-    "static/js/main.6243de68.chunk.js"
+    "static/js/main.b40d5654.chunk.js"
   ]
 }
