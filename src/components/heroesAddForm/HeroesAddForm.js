@@ -1,19 +1,23 @@
 import {useHttp} from '../../hooks/http.hook';
 import { useDispatch } from 'react-redux';
-import { heroesFetching, heroAdded, heroesFetchingError} from '../../actions';
+import { heroAdded } from '../heroesList/heroesSlice';
+import { selectAll } from '../heroesFilters/filtersSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { useSelector } from 'react-redux';
-
+import store from '../../store'
 const HeroesAddForm = () => {
     const dispatch = useDispatch();
     const {request} = useHttp();
-    const { filters } = useSelector(state => state.filters);
+    const {filtersLoadingStatus} = useSelector(state => state.filters);
+    const filters = selectAll(store.getState());
+    
     let temp = {id: '',
                 name: '',
                 description: '',
                 element: null}
-
     const handleChange = (e) => {
+        
+        console.log(e.target["name"])
         switch(e.target["name"]){
             case 'name':
                 temp.name = e.target.value;
@@ -23,7 +27,7 @@ const HeroesAddForm = () => {
                 break;
             case 'element':
                 temp.element = e.target.value;
-                break
+                break;
             default:
                 break;
         }
@@ -33,10 +37,26 @@ const HeroesAddForm = () => {
         e.preventDefault();
         temp.id = uuidv4();
         e.target.reset();
-        dispatch(heroesFetching());
         request(`http://localhost:3001/heroes/`, "POST", JSON.stringify(temp))
             .then(dispatch(heroAdded(temp)))
-            .catch(() => dispatch(heroesFetchingError()))
+        temp = {}
+    }
+
+    const renderFilters = (filters, status) => {
+        if (status === "loading") {
+            return <option>Загрузка элементов</option>
+        } else if (status === "error") {
+            return <option>Ошибка загрузки</option>
+        }
+        
+        if (filters && filters.length > 0 ) {
+            return filters.map(({value, name}) => {
+                // eslint-disable-next-line
+                if (value === 'all')  return;
+
+                return <option key={value} value={value}>{name}</option>
+            })
+        }
     }
 
     return (
@@ -45,7 +65,7 @@ const HeroesAddForm = () => {
                 <label htmlFor="name" className="form-label fs-4">Имя нового героя</label>
                 <input 
                     required
-                    onChange={handleChange}
+                    onChange={e => handleChange(e)}
                     type="text" 
                     name="name" 
                     className="form-control" 
@@ -58,7 +78,7 @@ const HeroesAddForm = () => {
                 <textarea
                     required
                     name="text" 
-                    onChange={handleChange}
+                    onChange={e => handleChange(e)}
                     className="form-control" 
                     id="text" 
                     placeholder="Что я умею?"
@@ -74,7 +94,7 @@ const HeroesAddForm = () => {
                     onChange={handleChange}
                     name="element">
                     <option >Я владею элементом...</option>
-                    {filters.map((el, i) => el.value !== 'all' ? <option key={i} value={el.value}>{el.name}</option> : null)}
+                    {renderFilters(filters, filtersLoadingStatus)}
                 </select>
             </div>
 

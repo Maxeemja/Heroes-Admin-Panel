@@ -1,21 +1,21 @@
 import {useEffect} from 'react';
-import {useHttp} from '../../hooks/http.hook';
 import { useDispatch, useSelector } from 'react-redux';
-import { filtersFetch, setFilter } from '../../actions';
+import { setFilter, fetchFilters, selectAll } from './filtersSlice';
+import store from '../../store'
 import Spinner from '../spinner/Spinner';
 const HeroesFilters = () => {
-    const {request} = useHttp();
     const dispatch = useDispatch();
-    const { filters , filtersLoadingStatus , activeFilter } = useSelector(state => state.filters);
-
+    const {filtersLoadingStatus, activeFilter} = useSelector(state => state.filters);
+    const filters = selectAll(store.getState())
     useEffect(() => {
-        dispatch(filtersFetch(request));
+        dispatch(fetchFilters());
     }, [])
 
     const setActiveFilter = (e) => {
         const filter = e.target["value"];
         dispatch(setFilter(filter));
     }
+
     return (
         <div className="card shadow-lg mt-4">
             <div className="card-body">
@@ -56,9 +56,3 @@ const HeroesFilters = () => {
 }
 
 export default HeroesFilters;
-// Задача для этого компонента:
-// Фильтры должны формироваться на основании загруженных данных
-// Фильтры должны отображать только нужных героев при выборе
-// Активный фильтр имеет класс active
-// Изменять json-файл для удобства МОЖНО!
-// Представьте, что вы попросили бэкенд-разработчика об этом
