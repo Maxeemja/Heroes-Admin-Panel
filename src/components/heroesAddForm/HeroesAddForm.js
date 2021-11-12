@@ -1,23 +1,21 @@
-import {useHttp} from '../../hooks/http.hook';
-import { useDispatch } from 'react-redux';
-import { heroAdded } from '../heroesList/heroesSlice';
-import { selectAll } from '../heroesFilters/filtersSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { useSelector } from 'react-redux';
 import store from '../../store'
+
+import { selectAll } from '../heroesFilters/filtersSlice';
+import { useAddHeroMutation } from '../../api/apiSlice';
+
 const HeroesAddForm = () => {
-    const dispatch = useDispatch();
-    const {request} = useHttp();
     const {filtersLoadingStatus} = useSelector(state => state.filters);
     const filters = selectAll(store.getState());
-    console.log(store.getState())
+
+    const [addHero, {isLoading}] = useAddHeroMutation();
+
     let temp = {id: '',
                 name: '',
                 description: '',
                 element: null}
     const handleChange = (e) => {
-        
-        console.log(e.target["name"])
         switch(e.target["name"]){
             case 'name':
                 temp.name = e.target.value;
@@ -33,12 +31,13 @@ const HeroesAddForm = () => {
         }
     }
 
-    const addHero = (e) => {
+    const postHero = (e) => {
         e.preventDefault();
         temp.id = uuidv4();
         e.target.reset();
-        request(`http://localhost:3001/heroes/`, "POST", JSON.stringify(temp))
-            .then(dispatch(heroAdded(temp)))
+        
+        addHero(temp).unwrap();
+
         temp = {}
     }
 
@@ -60,7 +59,7 @@ const HeroesAddForm = () => {
     }
 
     return (
-        <form className="border p-4 shadow-lg rounded" onSubmit={addHero}>
+        <form className="border p-4 shadow-lg rounded" onSubmit={postHero}>
             <div className="mb-3">
                 <label htmlFor="name" className="form-label fs-4">Имя нового героя</label>
                 <input 
